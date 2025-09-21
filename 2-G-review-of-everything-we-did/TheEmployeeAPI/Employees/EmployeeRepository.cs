@@ -9,6 +9,12 @@ public class EmployeeRepository : IRepository<Employee>
         return _employees.FirstOrDefault(e => e.Id == id);
     }
 
+    public async Task<Employee?> GetEmployeeBySsn(string ssn)
+    {
+        await Task.Delay(50); // Simulate async database call
+        return _employees.FirstOrDefault(e => e.SocialSecurityNumber == ssn);
+    }
+
     public IEnumerable<Employee> GetAll()
     {
         return _employees;
