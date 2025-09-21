@@ -1,8 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using TheEmployeeAPI.Abstractions;
+using TheEmployeeAPI.Employees;
 
 namespace TheEmployeeAPI.Tests;
 
@@ -48,10 +50,22 @@ public class BasicTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task CreateEmployee_ReturnsBadRequestResult()
     {
+        // Arrange
         var client = _factory.CreateClient();
-        var response = await client.PostAsJsonAsync("/employees", new{});
+        var invalidEmployee = new CreateEmployeeRequest(); // Empty object to trigger validation errors
 
+        // Act
+        var response = await client.PostAsJsonAsync("/employees", invalidEmployee);
+
+        // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        Assert.NotNull(problemDetails);
+        Assert.Contains("FirstName", problemDetails.Errors.Keys);
+        Assert.Contains("LastName", problemDetails.Errors.Keys);
+        Assert.Contains("The FirstName field is required.", problemDetails.Errors["FirstName"]);
+        Assert.Contains("The LastName field is required.", problemDetails.Errors["LastName"]);
     }
     
     [Fact]

@@ -1,4 +1,6 @@
+using System.ComponentModel.DataAnnotations;
 using TheEmployeeAPI.Abstractions;
+using TheEmployeeAPI.Employees;
 
 var employees = new List<Employee>
 {
@@ -13,6 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IRepository<Employee>, EmployeeRepository>();
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
@@ -60,9 +63,16 @@ employeeRoute.MapGet("{id:int}", (int id, IRepository<Employee> repository) => {
 });
 
 employeeRoute.MapPost(string.Empty, (CreateEmployeeRequest employeeRequest, IRepository<Employee> repository) => {
+    var validationProblems = new List<ValidationResult>();
+    var isValid = Validator.TryValidateObject(employeeRequest, new ValidationContext(employeeRequest), validationProblems, true);
+    if (!isValid)
+    {
+        return Results.BadRequest(validationProblems.ToValidationProblemDetails());
+    }
+
     var newEmployee = new Employee {
-        FirstName = employeeRequest.FirstName,
-        LastName = employeeRequest.LastName,
+        FirstName = employeeRequest.FirstName!,
+        LastName = employeeRequest.LastName!,
         SocialSecurityNumber = employeeRequest.SocialSecurityNumber,
         Address1 = employeeRequest.Address1,
         Address2 = employeeRequest.Address2,
