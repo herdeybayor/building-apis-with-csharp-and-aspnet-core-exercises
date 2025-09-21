@@ -9,6 +9,11 @@ public class EmployeeRepository : IRepository<Employee>
         return _employees.FirstOrDefault(e => e.Id == id);
     }
 
+    public Employee? GetEmployeeBySsn(string ssn)
+    {
+        return _employees.FirstOrDefault(e => e.SocialSecurityNumber == ssn);
+    }
+
     public IEnumerable<Employee> GetAll()
     {
         return _employees;
