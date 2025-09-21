@@ -23,7 +23,7 @@ public class BasicTests : IClassFixture<WebApplicationFactory<Program>>
     public async Task GetAllEmployees_ReturnsOkResult()
     {
         var client = _factory.CreateClient();
-        var response = await client.GetAsync("/employees");
+        var response = await client.GetAsync("/api/employees");
 
         response.EnsureSuccessStatusCode();
     }
@@ -32,7 +32,7 @@ public class BasicTests : IClassFixture<WebApplicationFactory<Program>>
     public async Task GetEmployeeById_ReturnsOkResult()
     {
         var client = _factory.CreateClient();
-        var response = await client.GetAsync("/employees/1");
+        var response = await client.GetAsync("/api/employees/1");
 
         response.EnsureSuccessStatusCode();
     }
@@ -41,7 +41,7 @@ public class BasicTests : IClassFixture<WebApplicationFactory<Program>>
     public async Task CreateEmployee_ReturnsCreatedResult()
     {
         var client = _factory.CreateClient();
-        var response = await client.PostAsJsonAsync("/employees", new Employee { FirstName = "John", LastName = "Doe" });
+        var response = await client.PostAsJsonAsync("/api/employees", new Employee { FirstName = "John", LastName = "Doe" });
 
         response.EnsureSuccessStatusCode();
     }
@@ -54,7 +54,7 @@ public class BasicTests : IClassFixture<WebApplicationFactory<Program>>
         var invalidEmployee = new CreateEmployeeRequest(); // Empty object to trigger validation errors
 
         // Act
-        var response = await client.PostAsJsonAsync("/employees", invalidEmployee);
+        var response = await client.PostAsJsonAsync("/api/employees", invalidEmployee);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -71,7 +71,7 @@ public class BasicTests : IClassFixture<WebApplicationFactory<Program>>
     public async Task UpdateEmployee_ReturnsOkResult()
     {
         var client = _factory.CreateClient();
-        var response = await client.PutAsJsonAsync("/employees/1", new Employee { FirstName = "John", LastName = "Doe" });
+        var response = await client.PutAsJsonAsync("/api/employees/1", new Employee { FirstName = "John", LastName = "Doe" });
 
         response.EnsureSuccessStatusCode();
     }
