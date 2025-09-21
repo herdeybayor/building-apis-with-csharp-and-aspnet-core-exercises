@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<EmployeeRepository>();
+builder.Services.AddSingleton<IRepository<Employee>, EmployeeRepository>();
 
 var app = builder.Build();
 
@@ -21,7 +21,7 @@ if (app.Environment.IsDevelopment())
 
 var employeeRoute = app.MapGroup("/employees");
 
-employeeRoute.MapGet(string.Empty, (EmployeeRepository repository) => {
+employeeRoute.MapGet(string.Empty, (IRepository<Employee> repository) => {
     
     return Results.Ok(repository.GetAll().Select(employee => new GetEmployeeResponse {
         FirstName = employee.FirstName,
@@ -36,7 +36,7 @@ employeeRoute.MapGet(string.Empty, (EmployeeRepository repository) => {
     }));
 });
 
-employeeRoute.MapGet("{id:int}", (int id, EmployeeRepository repository) => {
+employeeRoute.MapGet("{id:int}", (int id, IRepository<Employee> repository) => {
     var employee = repository.GetById(id);
     if (employee == null)
     {
@@ -56,7 +56,7 @@ employeeRoute.MapGet("{id:int}", (int id, EmployeeRepository repository) => {
     });
 });
 
-employeeRoute.MapPost(string.Empty, (CreateEmployeeRequest employeeRequest, EmployeeRepository repository) => {
+employeeRoute.MapPost(string.Empty, (CreateEmployeeRequest employeeRequest, IRepository<Employee> repository) => {
     var newEmployee = new Employee {
         FirstName = employeeRequest.FirstName,
         LastName = employeeRequest.LastName,
@@ -73,7 +73,7 @@ employeeRoute.MapPost(string.Empty, (CreateEmployeeRequest employeeRequest, Empl
     return Results.Created($"/employees/{newEmployee.Id}", employeeRequest);
 });
 
-employeeRoute.MapPut("{id}", (UpdateEmployeeRequest employeeRequest, int id, EmployeeRepository repository) => {
+employeeRoute.MapPut("{id}", (UpdateEmployeeRequest employeeRequest, int id, IRepository<Employee> repository) => {
     var existingEmployee = repository.GetById(id);
     if (existingEmployee == null)
     {
