@@ -1,1 +1,11 @@
-{}
+{
+    "sqltools.useNodeRuntime": true,
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "database": "${workspaceFolder:4-C-setting-up-your-first-dbcontext-and-dbset-with-migrations}/TheEmployeeAPI/employees.db",
+            "name": "TheEmployeeAPI"
+        }
+    ]
+}
