@@ -1,14 +1,5 @@
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using TheEmployeeAPI.Abstractions;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-
-var employees = new List<Employee>
-{
-    new Employee { Id = 1, FirstName = "John", LastName = "Doe" },
-    new Employee { Id = 2, FirstName = "Jane", LastName = "Doe" }
-};
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +10,6 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "TheEmployeeAPI.xml"));
 });
-builder.Services.AddSingleton<IRepository<Employee>, EmployeeRepository>();
 builder.Services.AddProblemDetails();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddHttpContextAccessor();

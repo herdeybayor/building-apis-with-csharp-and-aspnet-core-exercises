@@ -1,16 +1,17 @@
+using System.Threading.Tasks;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using TheEmployeeAPI.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 public class EmployeesController : BaseController
 {
-    private readonly IRepository<Employee> _repository;
     private readonly ILogger<EmployeesController> _logger;
+    private readonly AppDbContext _dbContext;
 
-    public EmployeesController(IRepository<Employee> repository, ILogger<EmployeesController> logger)
+    public EmployeesController(ILogger<EmployeesController> logger, AppDbContext dbContext)
     {
-        _repository = repository;
         _logger = logger;
+        _dbContext = dbContext;
     }
 
     /// <summary>
@@ -20,11 +21,11 @@ public class EmployeesController : BaseController
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<GetEmployeeResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public IActionResult GetAllEmployees()
+    public async Task<IActionResult> GetAllEmployees()
     {
-        var employees = _repository.GetAll().Select(EmployeeToGetEmployeeResponse);
+        var employees = await _dbContext.Employees.ToArrayAsync();
 
-        return Ok(employees);
+        return Ok(employees.Select(EmployeeToGetEmployeeResponse));
     }
 
     /// <summary>
@@ -36,9 +37,9 @@ public class EmployeesController : BaseController
     [ProducesResponseType(typeof(GetEmployeeResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public IActionResult GetEmployeeById(int id)
+    public async Task<IActionResult> GetEmployeeById(int id)
     {
-        var employee = _repository.GetById(id);
+        var employee = await _dbContext.Employees.SingleOrDefaultAsync(e => e.Id == id);
         if (employee == null)
         {
             return NotFound();
